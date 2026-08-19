@@ -282,6 +282,11 @@ impl TerminalRuntime {
             .resize(CrosswordsSize::new(usize::from(cols), usize::from(rows)));
     }
 
+    /// Returns `true` if the PTY runtime is active and not disconnected.
+    pub fn is_alive(&self) -> bool {
+        !self.pty_disconnected && !self.shutdown_started
+    }
+
     /// Returns the active kitty keyboard enhancement flags.
     pub fn kitty_keyboard_flags(&self) -> u8 {
         crate::vt::kitty_keyboard_flags(&self.term)

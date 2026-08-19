@@ -1,6 +1,8 @@
+/// Custom build script for embedding Windows icon resources and console allocation policies.
 fn main() -> std::io::Result<()> {
     println!("cargo:rerun-if-changed=assets/mobius.ico");
     println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed=Cargo.toml");
 
     if std::env::var("CARGO_CFG_TARGET_OS").as_deref() != Ok("windows") {
         return Ok(());
@@ -21,3 +23,4 @@ fn main() -> std::io::Result<()> {
 
     resource.compile()
 }
+

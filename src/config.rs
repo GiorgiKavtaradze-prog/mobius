@@ -77,7 +77,19 @@ impl AppConfig {
         let mut config: Self = toml::from_str(&contents)
             .with_context(|| format!("failed to parse {}", path.display()))?;
         config.resolve_relative_paths(&path);
+        config.sanitize();
         Ok(config)
+    }
+
+    /// Sanitizes configuration values to ensure they remain within valid runtime bounds.
+    pub fn sanitize(&mut self) {
+        self.window.opacity = self.window.opacity.clamp(0.0, 1.0);
+        self.window.width = self.window.width.max(100);
+        self.window.height = self.window.height.max(100);
+        self.window.frame_interval_ms = self.window.frame_interval_ms.max(1);
+        self.terminal.default_cols = self.terminal.default_cols.max(1);
+        self.terminal.default_rows = self.terminal.default_rows.max(1);
+        self.font.size = self.font.size.max(6);
     }
 
     fn default_config_path() -> anyhow::Result<Option<PathBuf>> {
@@ -614,4 +626,23 @@ action = "Toggle3DMode"
         slots.sort_unstable();
         assert_eq!(slots, (0..10).collect::<Vec<_>>());
     }
+
+    #[test]
+    fn sanitize_clamps_out_of_bound_values() {
+        let mut config = AppConfig::default();
+        config.window.opacity = 2.5;
+        config.window.width = 10;
+        config.window.height = 0;
+        config.terminal.default_cols = 0;
+        config.font.size = -5;
+
+        config.sanitize();
+
+        assert_eq!(config.window.opacity, 1.0);
+        assert_eq!(config.window.width, 100);
+        assert_eq!(config.window.height, 100);
+        assert_eq!(config.terminal.default_cols, 1);
+        assert_eq!(config.font.size, 6);
+    }
 }
+
