@@ -8,11 +8,12 @@ use clap::Parser;
 pub const DEFAULT_WINDOW_TITLE: &str = "Mobius";
 
 /// Command-line arguments for Mobius.
-#[derive(Debug, Parser)]
+#[derive(Debug, Parser, Clone)]
 #[command(
     name = env!("CARGO_PKG_NAME"),
     version,
     about = "A GPU-rendered terminal emulator with inline 3D graphics",
+    long_about = "Mobius is a high-performance GPU-rendered terminal emulator featuring inline 3D graphics, customized view modes, and seamless terminal capabilities.",
     trailing_var_arg = true
 )]
 pub struct Cli {
@@ -39,3 +40,16 @@ pub struct Cli {
     )]
     pub title: String,
 }
+
+impl Cli {
+    /// Returns `true` if a custom command was provided via command line.
+    pub fn has_custom_command(&self) -> bool {
+        self.command.as_ref().is_some_and(|cmd| !cmd.is_empty())
+    }
+
+    /// Returns the primary executable name if a command override is specified.
+    pub fn executable_name(&self) -> Option<&str> {
+        self.command.as_ref()?.first().map(|s| s.as_str())
+    }
+}
+

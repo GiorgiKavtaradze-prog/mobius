@@ -15,7 +15,7 @@ use winit::window::Icon;
 
 use mobius::cli::Cli;
 use mobius::config::{AppConfig, UpdateModeConfig};
-use mobius::paths::runtime_asset_root;
+use mobius::paths::{ensure_dir_exists, runtime_asset_root};
 use mobius::plugin::TerminalPlugin;
 use mobius::runtime::{RuntimeOptions, TerminalRuntime};
 use mobius::terminal::TerminalSurface;
@@ -53,7 +53,7 @@ fn main() -> anyhow::Result<()> {
     let terminal = TerminalSurface::new(&app_config)?;
     let window_title = cli.title;
     let asset_root = runtime_asset_root();
-    std::fs::create_dir_all(&asset_root)?;
+    ensure_dir_exists(&asset_root)?;
     let window_icon = load_window_icon()?;
 
     App::new()

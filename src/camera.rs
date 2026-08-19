@@ -132,9 +132,19 @@ impl TerminalCameraSlots {
         self.presets.get(slot)
     }
 
+    /// Returns `true` if the slot index is valid.
+    pub fn is_slot_valid(slot: usize) -> bool {
+        slot < TERMINAL_CAMERA_SLOT_COUNT
+    }
+
+    /// Resets the active slot's pose to default parameters.
+    pub fn reset_active_pose(&mut self) {
+        self.presets[self.active_slot].pose = TerminalCameraPose::default();
+    }
+
     /// Activates a preset, returning whether the active slot changed.
     pub fn activate(&mut self, slot: usize) -> bool {
-        if slot >= TERMINAL_CAMERA_SLOT_COUNT || self.active_slot == slot {
+        if !Self::is_slot_valid(slot) || self.active_slot == slot {
             return false;
         }
         self.active_slot = slot;
