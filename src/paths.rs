@@ -33,4 +33,3 @@ pub fn user_config_dir() -> Option<PathBuf> {
         .map(|strategy| strategy.config_dir().join(env!("CARGO_PKG_NAME")))
         .ok()
 }
-

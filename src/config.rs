@@ -645,4 +645,3 @@ action = "Toggle3DMode"
         assert_eq!(config.font.size, 6);
     }
 }
-
