@@ -1,0 +1,22 @@
+[package]
+name = "ratatui-mobius"
+version = "0.4.0"
+description = "A Ratatui widget for rendering inline 3D graphics via Mobius Graphics Protocol"
+authors = ["Orhun Parmaksız <orhunparmaksiz@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/orhun/mobius"
+repository = "https://github.com/orhun/mobius"
+keywords = ["ratatui", "terminal", "3d", "graphics"]
+categories = ["command-line-interface", "graphics"]
+edition = "2024"
+
+[dependencies]
+base64 = "0.22"
+ratatui-core = "0.1.0"
+
+[dev-dependencies]
+crossterm = "0.29"
+image = "0.25.10"
+ratatui = "0.30"
+ratatui-image = { version = "11.0.1", default-features = false, features = ["crossterm", "image-defaults"] }

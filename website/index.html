@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Mobius is a GPU-rendered terminal emulator with inline 3D graphics."
+    />
+    <meta name="theme-color" content="#12100f" />
+    <meta
+      property="og:title"
+      content="Mobius — A GPU-rendered terminal emulator with inline 3D graphics 🐀🧀"
+    />
+    <meta
+      property="og:description"
+      content="Mobius is a GPU-rendered terminal emulator with a spinning rat cursor, multiple 3D presentation modes and support for inline 3D graphics. Inspired by TempleOS and built with Rust and Ratatui."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="assets/images/mobius-social-card.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Mobius — A GPU-rendered terminal emulator with inline 3D graphics 🐀🧀"
+    />
+    <meta
+      name="twitter:description"
+      content="Mobius is a GPU-rendered terminal emulator with a spinning rat cursor, multiple 3D presentation modes and support for inline 3D graphics. Inspired by TempleOS and built with Rust and Ratatui."
+    />
+    <meta name="twitter:image" content="assets/images/mobius-social-card.png" />
+    <title>
+      Mobius — A GPU-rendered terminal emulator with inline 3D graphics 🐀🧀
+    </title>
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="assets/favicon/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="assets/favicon/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="assets/favicon/favicon-16x16.png"
+    />
+    <link rel="icon" href="assets/favicon/favicon.ico" sizes="any" />
+    <link rel="manifest" href="assets/favicon/site.webmanifest" />
+    <script
+      defer
+      src="https://umami.orhun.dev/script.js"
+      data-website-id="a5eb8e2d-baf7-46b6-a71c-e3d61c49ddc6"
+    ></script>
+    <link rel="stylesheet" href="assets/css/site.css" />
+  </head>
+  <body>
+    <div class="loading-screen" aria-hidden="true">
+      <div class="loading-brand">
+        <img class="loading-logo" src="assets/images/mobius-logo.gif" alt="" />
+      </div>
+    </div>
+
+    <main id="top" class="page">
+      <section class="hero" aria-label="Mobius demos">
+        <div class="slider-shell">
+          <button
+            class="slider-button slider-button-left"
+            type="button"
+            aria-label="Previous demo"
+          >
+            <span aria-hidden="true">&#8249;</span>
+          </button>
+
+          <div class="slider-stage">
+            <div class="window-titlebar" aria-hidden="true">
+              <div class="window-controls">
+                <span class="window-control"></span>
+                <span class="window-control"></span>
+                <span class="window-control"></span>
+              </div>
+              <span class="window-titlebar-text">Mobius</span>
+            </div>
+            <div class="video-stack">
+              <div class="video-loading" aria-hidden="true">
+                <img
+                  class="video-loading-logo"
+                  src="assets/images/mobius-logo.gif"
+                  alt=""
+                />
+              </div>
+              <video
+                class="demo-video demo-video-primary"
+                muted
+                autoplay
+                loop
+                playsinline
+                preload="metadata"
+              ></video>
+              <video
+                class="demo-video demo-video-secondary"
+                muted
+                loop
+                playsinline
+                preload="metadata"
+              ></video>
+            </div>
+          </div>
+
+          <button
+            class="slider-button slider-button-right"
+            type="button"
+            aria-label="Next demo"
+          >
+            <span aria-hidden="true">&#8250;</span>
+          </button>
+        </div>
+
+        <div class="demo-copy">
+          <p class="demo-title"></p>
+          <p class="demo-description"></p>
+        </div>
+
+        <div class="hero-actions" aria-label="Primary actions">
+          <a class="hero-action" href="https://blog.orhun.dev/introducing-mobius"
+            >Read the blog post</a
+          >
+          <a
+            class="hero-action"
+            href="https://github.com/orhun/mobius/releases/tag/v0.5.0"
+            >Download</a
+          >
+          <a class="hero-action" href="https://github.com/orhun/mobius"
+            >Source</a
+          >
+        </div>
+
+        <div class="video-preview">
+          <iframe
+            class="video-preview-frame"
+            src="https://www.youtube.com/embed/cY9AX5j-osY"
+            title="Mobius video preview"
+            allow="
+              accelerometer;
+              autoplay;
+              clipboard-write;
+              encrypted-media;
+              gyroscope;
+              picture-in-picture;
+              web-share;
+            "
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        &copy; 2026 Mobius,
+        <a href="https://github.com/orhun">Orhun Parmaksız</a>
+      </p>
+    </footer>
+
+    <script id="demo-data" type="application/json">
+      [
+        {
+          "src": "https://blog.orhun.dev/introducing-mobius/mobius-demo-with-audio.mp4",
+          "alt": "Mobius demo",
+          "title": "A GPU-rendered terminal emulator with inline 3D graphics 🧀",
+          "description": "Comes with a spinning rat cursor! 🐁"
+        },
+        {
+          "src": "https://blog.orhun.dev/introducing-mobius/mobius-3d-with-audio.mp4",
+          "alt": "Mobius 3D mode",
+          "title": "Ever wondered what's behind a terminal?",
+          "description": "Enter the 3D mode!"
+        },
+        {
+          "src": "https://blog.orhun.dev/introducing-mobius/mobius-draw-with-audio.mp4",
+          "alt": "Mobius draw demo",
+          "title": "Draw in 2D, preview it in 3D",
+          "description": "Build your custom 3D applications in the terminal! "
+        },
+        {
+          "src": "https://blog.orhun.dev/introducing-mobius/mobius-document-with-audio.mp4",
+          "alt": "Mobius document demo",
+          "title": "Inspired by TempleOS' inline objects",
+          "description": "RIP King Terry 👑"
+        },
+        {
+          "src": "https://blog.orhun.dev/introducing-mobius/mobius-big-rat-with-audio.mp4",
+          "alt": "Mobius big rat demo",
+          "title": "Just an oversized rat...",
+          "description": "Powered by the Mobius Graphics Protocol (RGP)"
+        }
+      ]
+    </script>
+    <script src="assets/js/site.js"></script>
+  </body>
+</html>

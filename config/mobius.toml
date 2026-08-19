@@ -1,0 +1,92 @@
+[window]
+width = 960
+height = 620
+opacity = 0.8
+# scale_factor = 1.0
+# update_mode = "Continuous"  # Use "LowPower" to redraw only after input or terminal output.
+# frame_interval_ms = 33      # Minimum milliseconds between LowPower redraws.
+
+[terminal]
+default_cols = 104
+default_rows = 32
+scrollback = 2000
+mouse_scroll_lines = 3
+
+# [shell]
+# program = "/bin/bash" 
+# args = []
+
+[env]
+TERM = "xterm-256color"
+
+[font]
+family = "DejaVu Sans Mono"
+style = "Regular"
+size = 12
+
+[cursor.model]
+path = "CairoSpinyMouse.obj"
+# texture = "texture.png"
+scale_factor = 6.0
+brightness = 0.5
+x_offset = 0.5
+plane_offset = 18.0
+visible = true
+
+[cursor.animation]
+spin_speed = 1.4
+bob_speed = 2.2
+bob_amplitude = 0.08
+
+[bindings]
+keys = [
+  { key = "C", with = "Control | alt", action = "Copy" },
+  { key = "V", with = "Control | alt", action = "Paste" },
+  { key = "PageUp", with = "alt", action = "ScrollPageUp" },
+  { key = "PageDown", with = "alt", action = "ScrollPageDown" },
+  { key = "Up", with = "alt", action = "ScrollUp" },
+  { key = "Down", with = "alt", action = "ScrollDown" },
+  { key = "Equal", with = "Control", action = "IncreaseFontSize" },
+  { key = "Minus", with = "Control", action = "DecreaseFontSize" },
+  { key = "Digit0", with = "Control | alt", action = "ResetFontSize" },
+  { key = "Enter", with = "Control | alt", action = "ToggleOrtho3DMode" },
+  { key = "P", with = "Control | alt", action = "TogglePersp3DMode" },
+  { key = "M", with = "Control | alt", action = "ToggleMobiusMode" },
+  { key = "Digit0", with = "Control | alt | shift", action = "ActivateCameraSlot0" },
+  { key = "Digit1", with = "Control | alt | shift", action = "ActivateCameraSlot1" },
+  { key = "Digit2", with = "Control | alt | shift", action = "ActivateCameraSlot2" },
+  { key = "Digit3", with = "Control | alt | shift", action = "ActivateCameraSlot3" },
+  { key = "Digit4", with = "Control | alt | shift", action = "ActivateCameraSlot4" },
+  { key = "Digit5", with = "Control | alt | shift", action = "ActivateCameraSlot5" },
+  { key = "Digit6", with = "Control | alt | shift", action = "ActivateCameraSlot6" },
+  { key = "Digit7", with = "Control | alt | shift", action = "ActivateCameraSlot7" },
+  { key = "Digit8", with = "Control | alt | shift", action = "ActivateCameraSlot8" },
+  { key = "Digit9", with = "Control | alt | shift", action = "ActivateCameraSlot9" },
+  { key = "Up", with = "Control | alt", action = "IncreaseWarp" },
+  { key = "Down", with = "Control | alt", action = "DecreaseWarp" },
+]
+
+[theme]
+foreground = "#dcd7ba"
+background = "#1f1f28"
+cursor = "#7e9cd8"
+
+[theme.normal]
+black = "#000000"
+red = "#cd3131"
+green = "#0dbc79"
+yellow = "#e5e510"
+blue = "#2472c8"
+magenta = "#bc3fbc"
+cyan = "#11a8cd"
+white = "#e5e5e5"
+
+[theme.bright]
+black = "#666666"
+red = "#f14c4c"
+green = "#23d18b"
+yellow = "#f5f543"
+blue = "#3b8eea"
+magenta = "#d670d6"
+cyan = "#29b8db"
+white = "#ffffff"
