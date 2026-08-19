@@ -52,4 +52,3 @@ impl Cli {
         self.command.as_ref()?.first().map(|s| s.as_str())
     }
 }
-
