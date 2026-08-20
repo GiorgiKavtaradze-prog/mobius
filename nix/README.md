@@ -1,6 +1,8 @@
 # Nix Packaging
 
-This flake provides a Nix package for [Mobius](https://github.com/GiorgiKavtaradze-prog/mobius), a GPU-rendered terminal emulator with inline 3D graphics.
+This directory contains the standalone Nix package definition for Mobius. The
+repository root also provides a flake with packages, a development shell, an
+overlay, NixOS and Home Manager modules, and checks.
 
 ## Supported Systems
 
@@ -9,39 +11,43 @@ This flake provides a Nix package for [Mobius](https://github.com/GiorgiKavtarad
 - `x86_64-darwin`
 - `aarch64-darwin`
 
-## Quick Start
+## Flake Outputs
 
-### Direct usage
+| Output | Purpose |
+| :----- | :------ |
+| `packages.<system>.mobius` | Mobius package. |
+| `packages.<system>.default` | Alias for the Mobius package. |
+| `devShells.<system>.default` | Rust development shell with Cargo, clippy, rustfmt, and rust-analyzer. |
+| `checks.<system>.mobius` | Build and test check through the package build. |
+| `formatter.<system>` | `nixfmt-rfc-style`. |
+| `overlays.default` | Adds `pkgs.mobius`. |
+| `nixosModules.default` | Declarative NixOS module. |
+| `homeManagerModules.default` | Declarative Home Manager module. |
+
+## Quick Start
 
 ```bash
 # Run directly
 nix run github:GiorgiKavtaradze-prog/mobius
 
-# Install to profile
+# Build the package
+nix build github:GiorgiKavtaradze-prog/mobius
+
+# Install into the current user profile
 nix profile install github:GiorgiKavtaradze-prog/mobius
+
+# Enter the development shell from a checkout
+nix develop
 ```
 
-### As a flake input
+## NixOS Module
+
+The module's default package is `pkgs.mobius`, so add the Mobius overlay or set
+`programs.mobius.package` explicitly.
+
+### Flake Example
 
 ```nix
-{
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    mobius.url = "github:GiorgiKavtaradze-prog/mobius";
-  };
-
-  outputs = { nixpkgs, mobius, ... }: {
-    # Use in your configuration
-  };
-}
-```
-
-## NixOS System Configuration
-
-Add mobius to your system packages with optional declarative configuration:
-
-```nix
-# flake.nix
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -52,6 +58,9 @@ Add mobius to your system packages with optional declarative configuration:
     nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
+        ({ ... }: {
+          nixpkgs.overlays = [ mobius.overlays.default ];
+        })
         mobius.nixosModules.default
         ./configuration.nix
       ];
@@ -62,59 +71,47 @@ Add mobius to your system packages with optional declarative configuration:
 
 ```nix
 # configuration.nix
+{ pkgs, ... }:
+
 {
   programs.mobius = {
     enable = true;
+    defaultShell = pkgs.zsh;
+    gpuBackend = "vulkan";
+    gpuAdapter = "RTX 3060";
     settings = {
       window = {
-        opacity = 0.9;
         width = 1200;
         height = 800;
-      };
-      shell = {
-        program = "zsh";
+        opacity = 0.9;
       };
       font = {
         family = "JetBrains Mono";
         size = 14;
+      };
+      terminal = {
+        scrollback = 5000;
       };
     };
   };
 }
 ```
 
-This will:
+When enabled, the NixOS module:
 
-- Install the Mobius package
-- Write configuration to `/etc/mobius/mobius.toml` (only when `settings` is non-empty)
-- Wrap the binary to use `--config-file /etc/mobius/mobius.toml` (only when `settings` is non-empty)
+- Installs Mobius into `environment.systemPackages`.
+- Writes `/etc/mobius/mobius.toml` when `settings` is non-empty.
+- Wraps the binary with `--config-file /etc/mobius/mobius.toml` when settings
+  are written.
+- Sets `WGPU_BACKEND` and `WGPU_ADAPTER_NAME` in the wrapper when GPU options
+  are configured.
+- Sets a default `SHELL` in the wrapper when `defaultShell` is configured.
 
-### GPU Backend Selection
+## Home Manager Module
 
-On systems with multiple GPUs or where the default Vulkan device creation fails
-(e.g. NVIDIA 580.x drivers reporting unsupported features), set `gpuBackend` and
-`gpuAdapter` to control wgpu device selection:
-
-```nix
-{
-  programs.mobius = {
-    enable = true;
-    gpuBackend = "vulkan";    # or "gl" / "gles"
-    gpuAdapter = "RTX 3060";  # substring match against adapter name
-  };
-}
-```
-
-When set, the NixOS module wraps the binary with `WGPU_BACKEND` and
-`WGPU_ADAPTER_NAME` environment variables. When both `settings` and GPU options
-are set, a single wrapper applies all flags.
-
-## Home Manager Configuration
-
-For user-level configuration without root:
+### Flake Example
 
 ```nix
-# flake.nix
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -122,96 +119,143 @@ For user-level configuration without root:
     mobius.url = "github:GiorgiKavtaradze-prog/mobius";
   };
 
-  outputs = { nixpkgs, home-manager, mobius, ... }: {
-    homeConfigurations.myuser = home-manager.lib.homeManagerConfiguration {
-      pkgs = nixpkgs.legacyPackages.x86_64-linux;
-      modules = [
-        mobius.homeManagerModules.default
-        ./home.nix
-      ];
+  outputs = { nixpkgs, home-manager, mobius, ... }:
+    let
+      system = "x86_64-linux";
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [ mobius.overlays.default ];
+      };
+    in
+    {
+      homeConfigurations.myuser = home-manager.lib.homeManagerConfiguration {
+        inherit pkgs;
+        modules = [
+          mobius.homeManagerModules.default
+          ./home.nix
+        ];
+      };
     };
-  };
 }
 ```
 
 ```nix
 # home.nix
+{ pkgs, ... }:
+
 {
   programs.mobius = {
     enable = true;
+    defaultShell = pkgs.fish;
+    gpuBackend = "vulkan";
     settings = {
-      window = {
-        opacity = 0.85;
-      };
-      shell = {
-        program = "fish";
+      window.opacity = 0.85;
+      font = {
+        family = "JetBrains Mono";
+        size = 13;
       };
       theme = {
         foreground = "#c0caf5";
         background = "#1a1b26";
+        cursor = "#7aa2f7";
       };
     };
   };
 }
 ```
 
-This will:
+When enabled, the Home Manager module:
 
-- Install the Mobius package to your user profile
-- Write configuration to `$XDG_CONFIG_HOME/mobius/mobius.toml` (typically `~/.config/mobius/mobius.toml`) (only when `settings` is non-empty)
-- Set `WGPU_BACKEND` and `WGPU_ADAPTER_NAME` in the user session when GPU options are configured
-- Mobius discovers this path automatically
+- Installs Mobius into `home.packages`.
+- Writes `$XDG_CONFIG_HOME/mobius/mobius.toml` when `settings` is non-empty.
+- Sets `WGPU_BACKEND` and `WGPU_ADAPTER_NAME` in `home.sessionVariables` when
+  GPU options are configured.
+- Sets `SHELL` in `home.sessionVariables` when `defaultShell` is configured.
 
-### GPU Backend Selection (Home Manager)
+Mobius discovers the Home Manager config path automatically.
 
-Same options as NixOS, but applied via `home.sessionVariables` instead of a
-binary wrapper:
+## Module Options
+
+Both modules expose the same options:
+
+| Option | Type | Default | Description |
+| :----- | :--- | :------ | :---------- |
+| `programs.mobius.enable` | bool | `false` | Enables Mobius installation and configuration. |
+| `programs.mobius.package` | package | `pkgs.mobius` | Package to install. Requires the overlay unless set explicitly. |
+| `programs.mobius.settings` | TOML-compatible attrset | `{}` | Configuration written to `mobius.toml`. |
+| `programs.mobius.gpuBackend` | null or enum | `null` | Forces the wgpu backend. Linux values: `"vulkan"`, `"gl"`, `"gles"`. Darwin values: `"metal"`, `"gl"`, `"gles"`. |
+| `programs.mobius.gpuAdapter` | null or string | `null` | Substring match for selecting a GPU adapter by name. |
+| `programs.mobius.defaultShell` | null or package | `null` | Shell package used when Mobius is launched without `-e` / `--command`. |
+
+## GPU Backend Selection
+
+Use `gpuBackend` and `gpuAdapter` when the default wgpu adapter selection is not
+appropriate, for example on multi-GPU systems, incompatible Vulkan ICD setups,
+remote desktop sessions, or headless/VNC environments.
+
+Linux example:
 
 ```nix
 {
   programs.mobius = {
     enable = true;
-    gpuBackend = "vulkan";
-    gpuAdapter = "RTX 3060";
+    gpuBackend = "vulkan";    # "vulkan", "gl", or "gles"
+    gpuAdapter = "RTX 3060";  # substring match
   };
 }
 ```
 
-## Module Options
+Darwin example:
 
-Both `nixosModules.default` and `homeManagerModules.default` expose:
-
-| Option                      | Type         | Default                        | Description                                                                              |
-| --------------------------- | ------------ | ------------------------------ | ---------------------------------------------------------------------------------------- |
-| `programs.mobius.enable`     | bool         | `false`                        | Enable Mobius installation                                                                |
-| `programs.mobius.package`    | package      | `self.packages.<system>.mobius` | The Mobius package to use                                                                 |
-| `programs.mobius.settings`   | attrset      | `{}`                           | Configuration written to `mobius.toml`                                                    |
-| `programs.mobius.gpuBackend` | null or enum | `null`                         | Force wgpu backend: `"vulkan"`, `"gl"`, or `"gles"`. null = auto-detect                  |
-| `programs.mobius.gpuAdapter` | null or str  | `null`                         | Substring match to select a specific GPU adapter (e.g. `"RTX 3060"`). null = auto-detect |
+```nix
+{
+  programs.mobius = {
+    enable = true;
+    gpuBackend = "metal"; # "metal", "gl", or "gles"
+  };
+}
+```
 
 ## Package Architecture
 
-```
-flake.nix          — Orchestration, modules, devShell
-nix/default.nix    — Standalone package (upstreamable to nixpkgs)
+```text
+flake.nix          # Flake outputs, overlay, modules, checks, and dev shell
+nix/default.nix    # Standalone package definition
 ```
 
-The package definition in `nix/default.nix` is designed to be upstreamed to nixpkgs as `pkgs/by-name/ra/mobius/package.nix`. It takes only standard nixpkgs arguments — no flake-specific constructs.
+The package in `nix/default.nix` is structured to be upstreamable to nixpkgs. It
+takes standard nixpkgs arguments plus `craneLib`, uses `craneLib.buildDepsOnly`
+for dependency caching, and performs the final package build with the full
+source tree so assets and configuration can be installed.
 
-## Development
+Installed package contents include:
+
+- The wrapped `mobius` binary.
+- Bundled object assets under `$out/share/mobius/objects`.
+- The default config at `$out/share/mobius/mobius.toml`.
+- A desktop entry and icon on platforms that support them.
+
+## Development Commands
 
 ```bash
+# Format Nix files
+nix fmt
+
 # Enter dev shell
 nix develop
 
-# Build package
+# Build default package
 nix build
 
-# Run checks (build + tests)
+# Run flake checks
 nix flake check
 ```
 
-## Maintainer
+## Release Maintenance
 
-- Giorgi Kavtardaze <giorgikavtaradze@example.com>
+Before cutting a release, keep package metadata synchronized:
 
+- `Cargo.toml` version.
+- `widget/Cargo.toml` version, when the widget crate changes.
+- `nix/default.nix` package version.
+- `CHANGELOG.md` release entry.
