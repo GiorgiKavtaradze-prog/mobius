@@ -19,6 +19,7 @@ mouse_scroll_lines = 3
 [env]
 TERM = "xterm-256color"
 
+
 [font]
 family = "DejaVu Sans Mono"
 style = "Regular"

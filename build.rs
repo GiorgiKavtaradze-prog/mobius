@@ -23,3 +23,4 @@ fn main() -> std::io::Result<()> {
 
     resource.compile()
 }
+
