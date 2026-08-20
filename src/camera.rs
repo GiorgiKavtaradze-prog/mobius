@@ -868,4 +868,3 @@ mod tests {
         assert_eq!(interaction.last_rotate_cursor, None);
     }
 }
-

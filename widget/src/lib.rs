@@ -408,7 +408,6 @@ impl Widget for &MobiusGraphic<'_> {
         if area.is_empty() {
             return;
         }
-        
 
         let place = self.place_sequence(area);
 
