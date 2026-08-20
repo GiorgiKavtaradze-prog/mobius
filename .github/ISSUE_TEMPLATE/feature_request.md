@@ -1,7 +1,7 @@
 ---
 name: Feature request
-about: Suggest an idea or improvement
-title: ""
+about: Suggest a feature or improvement
+title: "feat: "
 labels: enhancement
 assignees: ""
 ---
@@ -10,14 +10,23 @@ assignees: ""
 
 Describe the feature or improvement.
 
-## Motivation
+## Problem
 
-Explain the problem this would solve or why it would be useful.
+What workflow, limitation, or user need does this address?
 
-## Proposed approach
+## Proposed Behavior
 
-Describe how you think it should work.
+Describe how the feature should work from a user's perspective.
 
-## Additional context
+## Alternatives Considered
 
-Add examples, references or mockups if relevant.
+List any alternative approaches or workarounds you considered.
+
+## Compatibility
+
+Note any expected impact on configuration, RGP, key bindings, Nix packaging,
+widget APIs, performance, or existing behavior.
+
+## Additional Context
+
+Add examples, references, screenshots, mockups, or related issues when useful.

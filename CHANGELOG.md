@@ -1,82 +1,65 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to Mobius are documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
----
-
-## [0.5.0] - 2026-08-19
-
-### 🚀 Added
-
-- **GPU-rendered terminal emulator** powered by Bevy 0.19 & wgpu
-- **Inline 3D graphics** via the Mobius Graphics Protocol (RGP)
-  - Support for **OBJ**, **GLB**, and **STL** 3D model formats
-  - Path-based and base64 payload-based object registration
-  - Chunked payload registration for large assets
-  - Object placement, updating, and deletion in terminal cell space
-- **3D presentation modes**
-  - Flat 2D — classic terminal view
-  - Orthographic 3D — warped terminal plane
-  - Perspective 3D — fly-through camera
-  - Möbius Strip 3D — terminal wrapped on a Möbius strip
-- **10 persistent camera presets**
-  - Per-slot orthographic scale & perspective FOV
-  - Keyboard activation via `Ctrl+Alt+Shift+0-9`
-  - RGP camera control (`c` verb)
-- **Spinning rat cursor** 🐁
-  - 3D Cairo Spiny Mouse model
-  - Configurable spin speed, bob speed & amplitude
-  - Custom model path, color, brightness & scale
-- **Ratatui widget** (`ratatui-mobius`)
-  - Embed 3D objects in TUI applications
-  - Examples: big_rat, document, draw, rubiks_cube, mobius_chess
-- **Nix packaging**
-  - NixOS module with declarative configuration
-  - Home Manager module
-  - GPU backend & adapter selection (`WGPU_BACKEND`, `WGPU_ADAPTER_NAME`)
-- **Full TOML configuration**
-  - Window, terminal, shell, font, theme, cursor & bindings
-  - Complete ANSI 16-color theme palette
-  - Remappable key bindings
-- **CLI interface**
-  - `--config-file` — custom configuration path
-  - `--command` — execute a specific command
-  - `--title` — custom window title
-- **Terminal features**
-  - Scrollback with mouse & keyboard scrolling
-  - Copy/paste with clipboard integration
-  - Bracketed paste (DECSET 2004) with paste injection protection
-  - Kitty keyboard protocol support
-  - Mouse protocol support (SGR, UTF-8, X10)
-  - Font size adjustment at runtime
-  - Transparent window support
-  - Low-power redraw mode
-
-### 🎨 Changed
-
-- Terminal rendering powered by **Parley** & **Ratatui**
-- Window icon support for Windows & Linux
-- Optimized release profile with LTO & strip
-
-### 🐛 Fixed
-
-- Paste injection protection — ESC/CSI control characters stripped from bracketed paste payloads
-- Keypad navigation with NumLock disabled maps to logical navigation keys
-- Numpad chord misrouting with Num Lock on Windows/X11
-
----
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-### 🚧 Planned
+### Planned
 
-- Interactive object behavior (clicking, macros, object state updates)
-- Additional 3D model format support
-- More presentation modes
+- Interactive inline object behavior, including click handling, macros, and
+  object state updates.
+- Additional 3D model format support.
+- More presentation modes and camera workflows.
 
----
+## [0.5.0] - 2026-08-19
+
+### Added
+
+- GPU-rendered terminal emulator powered by Bevy 0.19 and wgpu.
+- Inline 3D graphics through the Mobius Graphics Protocol (RGP).
+- RGP object registration from local paths and base64 payloads.
+- Chunked payload registration for larger OBJ, GLB, and STL assets.
+- Object placement, update, deletion, transform, tint, brightness, and depth
+  controls in terminal cell space.
+- Four presentation modes:
+  - Flat 2D terminal rendering.
+  - Orthographic 3D terminal plane rendering.
+  - Perspective 3D camera navigation.
+  - Mobius strip projection for the terminal surface.
+- Ten persistent camera presets with keyboard activation and RGP camera control.
+- Configurable 3D cursor model with spin and bob animation controls.
+- `ratatui-mobius` widget crate for embedding Mobius graphics in Ratatui apps.
+- Widget examples for inline objects, document-style rendering, drawing, a
+  Rubik's cube demo, and a Mobius chessboard demo.
+- Nix flake package, development shell, NixOS module, and Home Manager module.
+- TOML configuration for window, terminal, shell, environment, font, theme,
+  cursor, and key bindings.
+- CLI flags:
+  - `--config-file` / `-c` for selecting a configuration file.
+  - `--command` / `-e` for launching a specific command.
+  - `--title` / `-T` for setting the window title.
+- Terminal functionality for scrollback, mouse and keyboard scrolling,
+  clipboard copy/paste, bracketed paste protection, Kitty keyboard protocol,
+  mouse protocols, runtime font scaling, transparent windows, and low-power
+  redraw mode.
+
+### Changed
+
+- Terminal rendering now combines Parley text shaping with Ratatui buffers and
+  the Bevy/wgpu compositor.
+- Release profile is optimized with LTO, symbol stripping, and a single codegen
+  unit.
+- Window icon support is available on Windows and Linux.
+
+### Fixed
+
+- Bracketed paste now strips ESC and CSI control introducers from pasted
+  payloads to reduce paste-injection risk.
+- Keypad navigation with Num Lock disabled maps to logical navigation keys.
+- Numpad camera-slot chords no longer collide with Windows/X11 Num Lock
+  navigation behavior.
 
 <!-- generated by git-cliff -->

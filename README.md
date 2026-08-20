@@ -7,333 +7,320 @@
 ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚═╝ ╚═════╝ ╚══════╝
 ```
 
-### _A GPU-Rendered Terminal Emulator with Inline 3D Graphics & Non-Euclidean Projections_
+Mobius is a GPU-rendered terminal emulator for experiments with inline 3D
+graphics, spatial terminal presentation modes, and terminal-native visual
+protocols.
 
-**Inspired by TempleOS · Powered by Rust 🦀, Bevy 🎮 & wgpu ⚡**
-
-[![Crates.io](https://img.shields.io/crates/v/mobius?style=for-the-badge&logo=rust&logoColor=white&color=%23f74c00)](https://crates.io/crates/mobius)
-[![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge&logo=open-source-initiative&logoColor=white)](LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 [![Rust](https://img.shields.io/badge/rust-2024-orange?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org)
-[![Bevy](https://img.shields.io/badge/Bevy-0.19-%23e6e6e6?style=for-the-badge&logo=bevy&logoColor=white)](https://bevyengine.org)
+[![Bevy](https://img.shields.io/badge/Bevy-0.19-lightgrey?style=for-the-badge)](https://bevyengine.org)
 [![Nix](https://img.shields.io/badge/Nix-Flake-blue?style=for-the-badge&logo=nixos&logoColor=white)](nix/README.md)
 [![GitHub](https://img.shields.io/badge/GitHub-GiorgiKavtaradze--prog%2Fmobius-black?style=for-the-badge&logo=github&logoColor=white)](https://github.com/GiorgiKavtaradze-prog/mobius)
 
----
+Mobius treats a terminal as more than a 2D grid of glyphs. It keeps the PTY,
+VT parser, scrollback, selection, clipboard, and key handling expected from a
+terminal emulator, then composites text and 3D objects through Bevy and wgpu.
+The result is a terminal surface that can remain flat, tilt into 3D space, fly
+through a perspective camera, or wrap onto a Mobius strip.
 
-[💡 Overview](#-overview) · [🔄 How It Works](#-how-it-works) · [✨ Features](#-features) · [🏗️ Architecture](#️-architecture) · [🚀 Installation](#-installation) · [⚡ Quick Start](#-quick-start) · [⚙️ Configuration](#️-configuration) · [🎮 Key Bindings](#-key-bindings) · [🧊 3D Modes](#-3d-presentation-modes) · [📡 RGP Protocol](#-mobius-graphics-protocol-rgp) · [🧩 Ratatui Widget](#-ratatui-widget) · [❄️ Nix](#-nix-packaging) · [🛠️ Development](#️-development)
+The inline graphics layer is driven by the Mobius Graphics Protocol (RGP), an
+APC escape-sequence protocol that lets terminal applications register, place,
+update, and remove 3D assets directly in terminal cell space.
 
----
+## Contents
 
-## 💡 Overview
+- [Highlights](#highlights)
+- [Architecture](#architecture)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Configuration](#configuration)
+- [Key Bindings](#key-bindings)
+- [Mobius Graphics Protocol](#mobius-graphics-protocol)
+- [Ratatui Widget](#ratatui-widget)
+- [Nix](#nix)
+- [Development](#development)
 
-**Mobius** bridges the gap between classic terminal multiplexing and real-time 3D viewport rendering. Drawing inspiration from **TempleOS**-style inline graphic documents, Mobius treats the command line not just as a 2D grid of glyphs, but as a fully hardware-accelerated 3D canvas.
+## Highlights
 
-With native support for **inline 3D mesh rendering** (OBJ, GLB, STL), real-time camera projections, warpable terminal planes, and Möbius strip spatial transforms, Mobius unlocks entirely new paradigms for interactive terminal user interfaces (TUIs), scientific visualization, and game development inside your terminal.
+- GPU compositor built with Bevy 0.19 and wgpu.
+- VT100/ANSI terminal parsing through `rio-vt`.
+- PTY process management through `portable-pty`.
+- Parley/Ratatui text pipeline for terminal grid rendering.
+- Inline 3D asset support for OBJ, GLB, and STL files.
+- RGP v1 support for path-based and payload-based asset registration.
+- Chunked base64 payload support for large assets and remote-shell workflows.
+- Placement, update, delete, transform, color, brightness, depth, and animation
+  controls for inline objects.
+- Flat, orthographic, perspective, and Mobius-strip presentation modes.
+- Ten persistent camera presets controlled from the keyboard or RGP.
+- Configurable 3D cursor model and cursor animation.
+- `ratatui-mobius` widget crate for terminal UI applications.
+- Nix flake package, dev shell, NixOS module, and Home Manager module.
 
----
-
-## 🔄 How It Works
-
-### Inline 3D & Viewport Execution Flow
-
-```mermaid
-flowchart LR
-    Launch["🚀 Launch Mobius<br/><code>GPU-Accelerated Shell</code>"] --> Load["🧊 Load 3D Models<br/><code>OBJ, GLB & STL Assets</code>"]
-    Load --> Register["📡 RGP Escape Sequence<br/><code>Register & Place Primitives</code>"]
-    Register --> Transform["🌀 Viewport Transform<br/><code>Ortho, Persp & Möbius Loop</code>"]
-    Transform --> Render["⚡ Hardware Render<br/><code>60+ FPS Bevy & wgpu Pipeline</code>"]
-```
-
----
-
-## ✨ Features
-
-<table>
-<tr>
-<td width="50%">
-
-### 🖥️ Hardware-Accelerated Rendering
-
-- **Bevy & wgpu Engine Core** for high-throughput GPU rendering
-- Sub-pixel text rasterization via **Parley** & **Ratatui**
-- Low-power adaptive redraw mode to conserve battery life
-- Native window transparency & blur-behind support
-
-</td>
-<td width="50%">
-
-### 🧊 Inline 3D Mesh Engine
-
-- Insert 3D models **directly into terminal grid cells**
-- Native loading for **OBJ**, **GLB** (animated), and **STL** formats
-- Real-time cell-bound transforms (rotation, depth, scale, color)
-- **Mobius Graphics Protocol (RGP)** ANSI escape sequence standard
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-### 🐁 3D Animated Cursor
-
-- Iconic 3D **Cairo Spiny Mouse** cursor replaces standard block cursors
-- Continuous spin & bob animations with custom physics
-- Fully customizable mesh, scale, color, and brightness parameters
-
-</td>
-<td width="50%">
-
-### 🎥 4 Spatial Presentation Modes
-
-- **Flat 2D** — Ultra-fast classic terminal viewport
-- **Orthographic 3D** — Tilt, zoom, and warp terminal planes
-- **Perspective 3D** — Fly through terminal buffer space in 3D
-- **Möbius Strip 3D** — Wrap terminal buffer onto a continuous Möbius loop
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-### 🎮 10 Camera Viewport Presets
-
-- Save, recall, and interpolate across **10 persistent camera slots**
-- Instant keybindings for quick scene switching
-- Programmable camera transitions over RGP protocol
-
-</td>
-<td width="50%">
-
-### 🧩 Ecosystem & Customization
-
-- First-class **`ratatui-mobius`** crate for embedding 3D graphics in TUIs
-- Declarative TOML configuration (`mobius.toml`)
-- Full **ANSI 16-color palette customization** & font family controls
-- First-class **NixOS** and **Home Manager** integration
-
-</td>
-</tr>
-</table>
-
----
-
-## 🏗️ Architecture
-
-### Pipeline Execution & Data Flow
+## Architecture
 
 ```mermaid
 flowchart LR
-    PTY["PTY Shell Process & Input Stream"] --> VT["VT100 ANSI Sequence Parser"]
-    VT --> RGP["RGP Protocol Decoder"]
-    RGP --> Mesh["3D Mesh Loader & Scene Transform"]
-    Mesh --> Camera["Camera Viewport & Möbius Mapping"]
-    Camera --> Render["Bevy & WGPU 60+ FPS Render Engine"]
+    Shell["PTY shell process"] --> VT["VT100 / ANSI parser"]
+    VT --> Screen["Terminal screen and scrollback"]
+    VT --> RGP["RGP decoder"]
+    RGP --> Assets["3D asset loader"]
+    Screen --> Text["Parley + Ratatui text pass"]
+    Assets --> Scene["Bevy scene graph"]
+    Text --> Compose["wgpu compositor"]
+    Scene --> Compose
+    Compose --> Window["Mobius window"]
 ```
 
-### Core Subsystems & Components
+Core subsystems:
 
-- 🐚 **PTY & Runtime Layer ([`src/runtime.rs`](src/runtime.rs), [`src/vt.rs`](src/vt.rs)):**
-  Manages background process execution via `portable-pty`. Translates ANSI/VT escape sequences into active screen buffer state using `rio-vt`.
-- 📡 **RGP Protocol Engine ([`src/rgp.rs`](src/rgp.rs)):**
-  Parses `ESC _ mobius;g;... ESC \` escape sequences in the PTY stream. Handles 3D asset registration (`r`), cell placement (`p`), transforms (`u`), deletion (`d`), and camera commands (`c`).
-- 🧊 **3D Scene & Mesh Loader ([`src/model.rs`](src/model.rs), [`src/scene/`](src/scene)):**
-  Loads OBJ, GLB, and STL assets asynchronously into Bevy asset pools. Calculates cell-bound transformations, mesh scales, lighting, and non-Euclidean Möbius strip vertex warps.
-- 🎥 **Camera Preset Controller ([`src/camera.rs`](src/camera.rs)):**
-  Manages 10 persistent camera slots with real-time FOV, rotation, and distance interpolation. Supports orthographic tilting and full 6-DOF perspective navigation.
-- ⚡ **Bevy & WGPU Compositor ([`src/plugin.rs`](src/plugin.rs), [`src/direct_render.rs`](src/direct_render.rs)):**
-  Combines Parley rasterized text glyphs and 3D mesh geometry into a single hardware-accelerated pass rendered via `wgpu` at 60+ FPS.
+| Area | Files | Responsibility |
+| :--- | :---- | :------------- |
+| CLI | `src/cli.rs` | Parses `--config-file`, `--command`, and `--title`. |
+| Runtime | `src/runtime.rs`, `src/vt.rs` | Spawns the PTY, reads output, writes input, and drives VT parsing. |
+| Terminal | `src/terminal.rs`, `src/rendering.rs` | Stores terminal state and prepares text rendering. |
+| RGP | `src/rgp.rs` | Parses Mobius graphics APC sequences. |
+| Scene | `src/model.rs`, `src/scene/` | Loads assets and renders 3D presentation modes. |
+| Input | `src/keyboard.rs`, `src/mouse.rs` | Handles key bindings, mouse input, copy/paste, and selection. |
+| Compositor | `src/plugin.rs`, `src/direct_render.rs` | Integrates Bevy, wgpu, text, and scene rendering. |
 
----
+## Installation
 
-## 🚀 Installation
+### Requirements
 
-### Option 1: Cargo (Rust Package Manager)
+- Rust stable toolchain with Rust 2024 edition support.
+- A GPU and driver supported by wgpu through Vulkan, Metal, DirectX 12, OpenGL,
+  or GLES, depending on platform.
+- Git for source installs.
+- Nix, optional, for reproducible builds and declarative installation.
+
+### From Source
 
 ```bash
-cargo install mobius
-```
-
-### Option 2: Build From Source
-
-```bash
-# Clone repository
 git clone https://github.com/GiorgiKavtaradze-prog/mobius.git
 cd mobius
-
-# Build in release mode
-cargo build --release
-
-# Run Mobius
-./target/release/mobius
+cargo run --release
 ```
 
-### Option 3: Nix / Flakes
+### Cargo Git Install
 
 ```bash
-# Run directly with Nix
+cargo install --git https://github.com/GiorgiKavtaradze-prog/mobius.git
+mobius
+```
+
+### Nix
+
+```bash
+# Run directly
 nix run github:GiorgiKavtaradze-prog/mobius
 
-# Install to profile
+# Install into the current profile
 nix profile install github:GiorgiKavtaradze-prog/mobius
 ```
 
-> ⚠️ **Requirements:** Mobius requires a GPU with Vulkan, Metal, or DirectX 12 support (via `wgpu`).
+See [nix/README.md](nix/README.md) for NixOS and Home Manager modules.
 
----
-
-## ⚡ Quick Start
+## Quick Start
 
 ```bash
-# Launch default terminal shell
+# Launch Mobius with the default shell resolution
 mobius
 
-# Launch with custom configuration file
+# Use a custom configuration file
 mobius --config-file ~/.config/mobius/mobius.toml
 
-# Launch with custom window title
-mobius --title "Mobius 3D Terminal"
+# Set the window title
+mobius --title "Mobius"
 
-# Launch directly into a specific shell/command
-mobius --command zsh
+# Run an explicit command; keep --command / -e at the end
+mobius -e zsh
+mobius -e bash -lc "htop"
 ```
 
----
+Shell selection order:
 
-## ⚙️ Configuration
+1. `shell.program` and `shell.args` from configuration.
+2. The `SHELL` environment variable.
+3. On Windows, Git for Windows `bash.exe` when discoverable.
+4. On Windows, `%COMSPEC%`, then `cmd.exe`.
+5. On Unix-like systems, `/bin/sh`.
 
-Mobius loads settings using the following resolution hierarchy:
+## Configuration
 
-1. CLI argument `--config-file <path>`
-2. `$XDG_CONFIG_HOME/mobius/mobius.toml`
-3. Local default configuration (`config/mobius.toml`)
+Mobius loads configuration in this order:
 
-### Example `mobius.toml`
+1. The explicit `--config-file <path>` argument.
+2. The platform user config path for `mobius/mobius.toml` (for example
+   `$XDG_CONFIG_HOME/mobius/mobius.toml` or `~/.config/mobius/mobius.toml` on
+   Linux).
+3. The repository fallback `config/mobius.toml`, when running from source.
+4. Built-in defaults.
+
+Relative paths in `cursor.model.path`, `cursor.model.texture`, and
+`shell.program` are resolved relative to the selected configuration file when
+appropriate.
+
+Minimal example:
 
 ```toml
 [window]
 width = 960
 height = 620
-opacity = 0.85
-update_mode = "Continuous" # "Continuous" | "LowPower"
-frame_interval_ms = 16
+opacity = 0.8
+update_mode = "Continuous" # "Continuous" or "LowPower"
+frame_interval_ms = 33
 
 [terminal]
 default_cols = 104
 default_rows = 32
 scrollback = 2000
+mouse_scroll_lines = 3
+
+[shell]
+program = "/bin/zsh"
+args = []
+
+[env]
+TERM = "xterm-256color"
 
 [font]
-family = "JetBrains Mono"
-style = "Regular"
-size = 14
-
-[theme]
-foreground = "#dcd7ba"
-background = "#1f1f28"
-cursor = "#7e9cd8"
-black   = "#090618"
-red     = "#c34043"
-green   = "#76946a"
-yellow  = "#c0a36e"
-blue    = "#7e9cd8"
-magenta = "#957fb8"
-cyan    = "#7aa89f"
-white   = "#dcd7ba"
+family = "DejaVu Sans Mono"
+style = "Regular" # "Regular", "Bold", "Italic", or "BoldItalic"
+size = 12
 
 [cursor.model]
 path = "CairoSpinyMouse.obj"
 scale_factor = 6.0
 brightness = 0.5
+x_offset = 0.5
+plane_offset = 18.0
+color = "#ffffff"
 visible = true
+# texture = "texture.png"
 
 [cursor.animation]
 spin_speed = 1.4
 bob_speed = 2.2
 bob_amplitude = 0.08
+
+[theme]
+foreground = "#dcd7ba"
+background = "#1f1f28"
+cursor = "#7e9cd8"
+
+[theme.normal]
+black = "#000000"
+red = "#cd3131"
+green = "#0dbc79"
+yellow = "#e5e510"
+blue = "#2472c8"
+magenta = "#bc3fbc"
+cyan = "#11a8cd"
+white = "#e5e5e5"
+
+[theme.bright]
+black = "#666666"
+red = "#f14c4c"
+green = "#23d18b"
+yellow = "#f5f543"
+blue = "#3b8eea"
+magenta = "#d670d6"
+cyan = "#29b8db"
+white = "#ffffff"
+
+[bindings]
+keys = [
+  { key = "Enter", with = "Control | alt", action = "ToggleOrtho3DMode" },
+  { key = "P", with = "Control | alt", action = "TogglePersp3DMode" },
+  { key = "M", with = "Control | alt", action = "ToggleMobiusMode" },
+]
 ```
 
----
+Set a binding's `action` to `none` to disable an inherited default binding with
+the same trigger.
 
-## 🎮 Key Bindings
+## Key Bindings
 
-| Key Combination              | Action                | Description                                  |
-| :--------------------------- | :-------------------- | :------------------------------------------- |
-| `Ctrl + Alt + Enter`         | **Orthographic Mode** | Toggle tilted orthographic 3D plane view     |
-| `Ctrl + Alt + P`             | **Perspective Mode**  | Toggle 3D perspective fly-through camera     |
-| `Ctrl + Alt + M`             | **Möbius Strip Mode** | Project terminal grid onto a 3D Möbius loop  |
-| `Ctrl + Alt + Shift + [0-9]` | **Camera Presets**    | Save / Activate camera viewpoint slot 0–9    |
-| `Ctrl + Alt + ↑ / ↓`         | **Warp Surface**      | Increase / decrease terminal plane curvature |
-| `Alt + ↑ / ↓`                | **Scroll Line**       | Scroll viewport up / down by 1 line          |
-| `Alt + PageUp / PageDown`    | **Scroll Page**       | Scroll viewport up / down by 1 full page     |
-| `Ctrl + Alt + C`             | **Copy**              | Copy selected terminal text buffer           |
-| `Ctrl + Alt + V`             | **Paste**             | Paste clipboard content to shell             |
-| `Ctrl + = / -`               | **Font Scale**        | Increase / decrease rendered font size       |
-| `Ctrl + Alt + 0`             | **Reset Font**        | Reset font size to default                   |
+Default bindings:
 
----
+| Key combination | Action |
+| :-------------- | :----- |
+| `Ctrl+Alt+Enter` | Toggle orthographic 3D mode. |
+| `Ctrl+Alt+P` | Toggle perspective 3D mode. |
+| `Ctrl+Alt+M` | Toggle Mobius strip mode. |
+| `Ctrl+Alt+Shift+0` through `Ctrl+Alt+Shift+9` | Activate camera preset slots 0-9. |
+| `Ctrl+Alt+Up` / `Ctrl+Alt+Down` | Increase or decrease plane warp. |
+| `Alt+Up` / `Alt+Down` | Scroll one line. |
+| `Alt+PageUp` / `Alt+PageDown` | Scroll one page. |
+| `Ctrl+Alt+C` | Copy selected terminal text. |
+| `Ctrl+Alt+V` | Paste clipboard contents. |
+| `Ctrl+=` / `Ctrl+-` | Increase or decrease font size. |
+| `Ctrl+Alt+0` | Reset font size. |
 
-- **Flat 2D Mode:** Classic high-performance terminal layout.
-- **Orthographic 3D Mode:** Turns your terminal buffer into a tilted, floatable 3D sheet with adjustable plane curvature.
-- **Perspective 3D Mode:** Real-time 6-DOF camera control allowing you to fly inside your terminal buffer space.
-- **Möbius Strip 3D Mode:** Wraps the entire terminal grid onto a non-orientable Möbius strip, creating a seamless 3D surface loop.
+## Presentation Modes
 
----
+| Mode | Description |
+| :--- | :---------- |
+| Flat 2D | Standard high-performance terminal rendering. |
+| Orthographic 3D | Renders the terminal as a tilted 3D plane with adjustable warp. |
+| Perspective 3D | Uses a perspective camera for fly-through terminal-space views. |
+| Mobius Strip 3D | Projects the terminal grid onto a continuous Mobius strip surface. |
 
-## 📡 Mobius Graphics Protocol (RGP)
+## Mobius Graphics Protocol
 
-The **Mobius Graphics Protocol (RGP)** enables any program running inside Mobius to inject, manipulate, and animate 3D assets inline.
-
-### Escape Sequence Syntax
+RGP is the terminal-native protocol used to add 3D objects to Mobius. It is
+transported through APC escape sequences:
 
 ```text
 ESC _ mobius;g;<verb>[;<key=value>...] ESC \
 ```
 
-### Protocol Verbs
+Supported verbs:
 
-| Verb | Operation    | Description                                               |
-| :--: | :----------- | :-------------------------------------------------------- |
-| `s`  | **Support**  | Query client capabilities & protocol version              |
-| `r`  | **Register** | Register a 3D model asset (path or base64 payload)        |
-| `p`  | **Place**    | Instantiate model into cell grid space `(row, col, w, h)` |
-| `u`  | **Update**   | Modify rotation, depth, scale, brightness, or color       |
-| `d`  | **Delete**   | Remove model instance from terminal buffer                |
-| `c`  | **Camera**   | Trigger camera preset or alter FOV/angles                 |
+| Verb | Operation |
+| :--: | :-------- |
+| `s` | Query protocol support. |
+| `r` | Register an OBJ, GLB, or STL asset by path or payload. |
+| `p` | Place a registered object in terminal cell space. |
+| `u` | Update an object's transform or style. |
+| `d` | Delete one object or all RGP objects. |
+| `c` | Update and optionally activate a camera preset. |
 
-### Example Shell Script
+Example:
 
 ```bash
-# 1. Register a 3D model asset
+# Register an asset by path
 printf '\033_mobius;g;r;id=7;fmt=obj;path=CairoSpinyMouse.obj\033\\'
 
-# 2. Place model at row 5, col 10 (spanning 4x3 cells) with animation & lighting
+# Place it around row 5, column 10, spanning 4 columns by 3 rows
 printf '\033_mobius;g;p;id=7;row=5;col=10;w=4;h=3;animate=1;scale=1.2;depth=1.5;color=7fd0ff;brightness=1.0;ry=45\033\\'
 
-# 3. Rotate object dynamically
+# Rotate it later
 printf '\033_mobius;g;u;id=7;ry=180\033\\'
 
-# 4. Switch camera to Perspective 3D mode with 60° FOV
+# Switch camera preset 0 to perspective mode
 printf '\033_mobius;g;c;id=0;set=1;type=Persp;fov=60;rx=15;ry=25\033\\'
 
-# 5. Delete model instance
+# Delete the object
 printf '\033_mobius;g;d;id=7\033\\'
 ```
 
-📖 **Complete Specification:** [`protocols/graphics.md`](protocols/graphics.md)
+For the full wire-format specification, see
+[protocols/graphics.md](protocols/graphics.md).
 
----
+## Ratatui Widget
 
-## 🧩 Ratatui Widget (`ratatui-mobius`)
+The `ratatui-mobius` crate lets Ratatui applications emit RGP sequences through
+normal widget rendering.
 
-Mobius provides a native crate for [Ratatui](https://github.com/ratatui/ratatui) applications to render inline 3D assets effortlessly:
-
-```rust
+```rust,no_run
 use std::io;
+
 use ratatui_core::{buffer::Buffer, layout::Rect, widgets::Widget};
 use ratatui_mobius::{MobiusGraphic, MobiusGraphicSettings, ObjectFormat};
 
 fn main() -> io::Result<()> {
-    // Define 3D graphic configuration
     let mut graphic = MobiusGraphic::new(
         MobiusGraphicSettings::new("assets/objects/SpinyMouse.glb")
             .id(42)
@@ -344,14 +331,11 @@ fn main() -> io::Result<()> {
             .rotation([0.0, 45.0, 0.0]),
     );
 
-    // Register asset with terminal protocol
     graphic.register()?;
 
-    // Render into Ratatui buffer rect
-    let mut buf = Buffer::empty(Rect::new(0, 0, 80, 24));
-    (&graphic).render(Rect::new(10, 5, 20, 8), &mut buf);
+    let mut buffer = Buffer::empty(Rect::new(0, 0, 80, 24));
+    (&graphic).render(Rect::new(10, 5, 20, 8), &mut buffer);
 
-    // Modify properties in real time
     graphic.settings_mut().rotation = [0.0, 90.0, 0.0];
     graphic.update()?;
 
@@ -359,100 +343,81 @@ fn main() -> io::Result<()> {
 }
 ```
 
-### Interactive Demos Included
+Widget examples:
 
-- [`big_rat.rs`](widget/examples/big_rat.rs) — Simple inline 3D model render demo
-- [`document.rs`](widget/examples/document.rs) — TempleOS-style rich document editor
-- [`draw.rs`](widget/examples/draw.rs) — 2D canvas editor with live 3D object preview
-- [`rubiks_cube.rs`](widget/examples/rubiks_cube.rs) — Interactive 3D Rubik's cube TUI game
-- [`mobius_chess.rs`](widget/examples/mobius_chess.rs) — 3D Möbius strip chessboard game
+- [big_rat.rs](widget/examples/big_rat.rs): minimal inline object demo.
+- [document.rs](widget/examples/document.rs): rich document-style demo.
+- [draw.rs](widget/examples/draw.rs): 2D drawing pane with live 3D preview.
+- [rubiks_cube.rs](widget/examples/rubiks_cube.rs): interactive 3D Rubik's cube.
+- [mobius_chess.rs](widget/examples/mobius_chess.rs): 3D Mobius chessboard demo.
 
----
+See [widget/README.md](widget/README.md) for the widget API guide.
 
-## ❄️ Nix Packaging
+## Nix
 
-Mobius provides first-class Nix flakes, NixOS, and Home Manager modules:
+Mobius includes:
 
-### NixOS Module Example
+- `packages.<system>.mobius`
+- `devShells.<system>.default`
+- `overlays.default`
+- `nixosModules.default`
+- `homeManagerModules.default`
 
-```nix
-{
-  programs.mobius = {
-    enable = true;
-    gpuBackend = "vulkan"; # "vulkan" | "gl" | "gles"
-    settings = {
-      window = {
-        opacity = 0.9;
-        width = 1200;
-        height = 800;
-      };
-      font = {
-        family = "JetBrains Mono";
-        size = 14;
-      };
-    };
-  };
-}
-```
-
-📖 **Nix Guide & Flake Documentation:** [`nix/README.md`](nix/README.md)
-
----
-
-## 📦 Bundled 3D Assets
-
-| Model                 | Format |   Category    | Description                                   |
-| :-------------------- | :----: | :-----------: | :-------------------------------------------- |
-| `CairoSpinyMouse.obj` | `OBJ`  | Cursor / Mesh | Classic 3D Cairo Spiny Mouse cursor 🐁        |
-| `SpinyMouse.glb`      | `GLB`  | Animated Mesh | High-resolution spiny mouse with skeletal rig |
-| `Ferris.glb`          | `GLB`  |    Mascot     | Ferris the Rust mascot 🦀                     |
-| `SkateMouse.stl`      | `STL`  |     Mesh      | Skateboarding spiny mouse 🛹                  |
-
----
-
-## 🛠️ Development
+Typical Nix commands:
 
 ```bash
-# Build debug binary
-cargo build
-
-# Run unit & integration tests
-cargo test
-
-# Run code linter
-cargo clippy -- -D warnings
-
-# Format codebase
-cargo fmt --check
+nix develop
+nix build
+nix flake check
 ```
 
-### Directory Structure
+Detailed examples are available in [nix/README.md](nix/README.md).
+
+## Development
+
+Main crate checks:
+
+```bash
+cargo fmt --all -- --check
+cargo clippy --all-targets --all-features -- -D warnings
+cargo test --all-targets --all-features
+```
+
+Widget crate checks:
+
+```bash
+cargo fmt --manifest-path widget/Cargo.toml --all -- --check
+cargo clippy --manifest-path widget/Cargo.toml --all-targets -- -D warnings
+cargo test --manifest-path widget/Cargo.toml --all-targets
+cargo check --manifest-path widget/Cargo.toml --examples
+```
+
+Project structure:
 
 ```text
 mobius/
-├── src/               # Bevy runtime, render pipeline, VT engine, RGP protocol
-│   ├── camera.rs      # Camera projection systems & 10 presets
-│   ├── config.rs      # TOML configuration parser
-│   ├── keyboard.rs    # Input event map & shortcuts
-│   ├── mouse.rs       # Mouse state & text selection
-│   ├── rgp.rs         # Mobius Graphics Protocol decoder & dispatcher
-│   ├── scene/         # 3D Mesh rendering, planes & Möbius loops
-│   └── terminal.rs    # Terminal grid buffer & Parley text engine
-├── protocols/         # RGP specification documentation
-│   └── graphics.md    # Complete RGP escape sequence standard
-├── widget/            # ratatui-mobius widget crate & examples
-├── config/            # Default mobius.toml configuration template
-├── assets/            # Pre-packaged OBJ, GLB, STL models & icons
-├── nix/               # Nix flakes, NixOS & Home Manager modules
-└── website/           # Official project website
+|-- src/                 # Main terminal emulator crate
+|-- protocols/           # RGP specification
+|-- widget/              # ratatui-mobius crate
+|-- config/              # Default configuration
+|-- assets/              # Bundled models and icons
+|-- nix/                 # Nix package and module documentation
+|-- website/             # Project website
+|-- Cargo.toml
+`-- flake.nix
 ```
 
----
+## Security
 
-## 📄 License
+Please report vulnerabilities privately. See [SECURITY.md](SECURITY.md) for the
+supported version policy and disclosure process.
 
-Distributed under the [MIT License](LICENSE).
+## License
 
----
+Mobius is distributed under the [MIT License](LICENSE).
 
-**Crafted with 🧀 & 🦀 by [Giorgi Kavtaradze](https://github.com/GiorgiKavtaradze-prog)**
+## Acknowledgments
+
+Mobius is inspired by TempleOS-style inline graphical documents, modern
+terminal protocol experimentation, Ratatui, Bevy, and the Rust terminal
+ecosystem.
