@@ -316,3 +316,4 @@ inline graphics but designed for modern terminal capabilities and 3D rendering.
 [DolDoc]: https://tinkeros.github.io/WbTempleOS/Doc/DolDocOverview.html
 [Glyph Protocol]: https://rapha.land/introducing-glyph-protocol-for-terminals/
 [APC]: https://en.wikipedia.org/wiki/C0_and_C1_control_codes#C1_controls
+

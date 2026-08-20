@@ -267,3 +267,4 @@ fn fill_background(area: Rect, buf: &mut ratatui::buffer::Buffer) {
         }
     }
 }
+
