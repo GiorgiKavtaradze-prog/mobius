@@ -188,7 +188,6 @@ fn run(terminal: &mut DefaultTerminal) -> io::Result<()> {
         }
     }
 }
-
 /// Camera presets cycled with the `v` key, sent as RGP `c` commands.
 /// `scale` is orthographic zoom; `fov` and all rotations are degrees.
 #[derive(Clone, Copy)]
